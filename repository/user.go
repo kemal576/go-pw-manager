@@ -27,7 +27,7 @@ func (u *userRepository) GetAll() ([]models.User, error) {
 	var users []models.User
 	for response.Next() {
 		var user models.User
-		err := response.Scan(&user.Id, &user.FirstName, &user.LastName, &user.PasswordHash, &user.CreatedAt)
+		err := response.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Password, &user.CreatedAt, &user.Email)
 		if err != nil {
 			return users, err
 		}
@@ -43,7 +43,7 @@ func (u *userRepository) GetById(id int) (models.User, error) {
 		return user, err
 	}
 	for response.Next() {
-		err := response.Scan(&user.Id, &user.FirstName, &user.LastName, &user.PasswordHash, &user.CreatedAt)
+		err := response.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Password, &user.CreatedAt, &user.Email)
 		if err != nil {
 			return user, err
 		}
@@ -53,12 +53,12 @@ func (u *userRepository) GetById(id int) (models.User, error) {
 
 func (u *userRepository) Create(user *models.User) (int, error) {
 	var lastInsertId int
-	stmt, err := u.db.Prepare("INSERT INTO users(firstname,lastname,password_hash) VALUES($1,$2,$3) returning id;")
+	stmt, err := u.db.Prepare("INSERT INTO users(firstname,lastname,password_hash,email) VALUES($1,$2,$3,$4) returning id;")
 	if err != nil {
 		return 0, err
 	}
 	defer stmt.Close()
-	stmt.QueryRow(user.FirstName, user.LastName, user.PasswordHash).Scan(&lastInsertId)
+	stmt.QueryRow(user.FirstName, user.LastName, user.Password, user.Email).Scan(&lastInsertId)
 	return lastInsertId, nil
 }
 
@@ -68,7 +68,7 @@ func (u *userRepository) Update(user *models.User) error {
 		return err
 	}
 	defer stmt.Close()
-	stmt.Exec(user.FirstName, user.LastName, user.PasswordHash, user.Id)
+	stmt.Exec(user.FirstName, user.LastName, user.Password, user.Id)
 	return nil
 }
 
