@@ -4,7 +4,13 @@ import (
 	"database/sql"
 
 	"github.com/kemal576/go-pw-manager/internal/secret"
+	"github.com/kemal576/go-pw-manager/repository/user"
 )
+
+type Database struct {
+	db    *sql.DB
+	users UserRepository
+}
 
 func Conn() (*sql.DB, error) {
 	creds, err := secret.ReadSecrets("dbsecrets")
@@ -21,14 +27,14 @@ func Conn() (*sql.DB, error) {
 	return db, nil
 }
 
-/*
-func CheckVersion() string {
-	db, err := sql.Open("mysql", "root:1234567@tcp(127.0.0.1:3306)/crud")
-	utils.ErrorCheck(err)
-
-	var version string
-	err2 := db.QueryRow("SELECT VERSION()").Scan(&version)
-	utils.ErrorCheck(err2)
-	return version
+func New(db *sql.DB) *Database {
+	return &Database{
+		db:    db,
+		users: user.NewRepository(db),
+	}
 }
-*/
+
+// Users returns the UserRepository.
+func (db *Database) Users() UserRepository {
+	return db.users
+}

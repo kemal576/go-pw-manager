@@ -17,12 +17,10 @@ func ReadSecrets(vaultPath string) (map[string]string, error) {
 	}
 
 	client.SetToken(cfg.VaultToken)
-
 	secrets, err2 := client.Logical().Read("secret/data/" + vaultPath)
 	if err2 != nil {
 		return nil, err2
 	}
-
 	dataMap, _ := secrets.Data["data"].(map[string]interface{})
 
 	dataStr := make(map[string]string)
@@ -31,4 +29,15 @@ func ReadSecrets(vaultPath string) (map[string]string, error) {
 	}
 
 	return dataStr, nil
+}
+
+func ReadSecret(vaultPath, secretName string) ([]byte, error) {
+	var key []byte
+	secret, err := ReadSecrets(vaultPath)
+	if err != nil {
+		return key, err
+	}
+
+	key = []byte(secret[secretName])
+	return key, nil
 }

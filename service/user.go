@@ -1,9 +1,8 @@
 package service
 
 import (
-	"github.com/kemal576/go-pw-manager/interfaces"
+	"github.com/kemal576/go-pw-manager/internal/app"
 	"github.com/kemal576/go-pw-manager/models"
-	"github.com/kemal576/go-pw-manager/security"
 	"github.com/kemal576/go-pw-manager/utils"
 )
 
@@ -23,12 +22,12 @@ func NewUserService(_userRepository IUserRepository) *userService {
 	return &userService{userRepository: _userRepository}
 }
 
-func (u *userService) GetAll() interfaces.IResponse {
+func (u *userService) GetAll() []models.User {
 	users, err := u.userRepository.GetAll()
 	if err != nil {
-		return models.NewResponse(false, "Kullanıcılar getirilirken bir hata oluştu.")
+		return nil
 	}
-	return models.NewDataResponse(true, "Tüm kullanıcılar listelendi.", users)
+	return users
 }
 
 func (u *userService) GetById(id int) models.User {
@@ -40,7 +39,7 @@ func (u *userService) GetById(id int) models.User {
 
 func (u *userService) Create(user *models.User) int {
 
-	hash, err := security.HashPassword(user.Password)
+	hash, err := app.HashPassword(user.Password)
 	utils.ErrorCheck(err)
 
 	user.Password = hash

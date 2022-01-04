@@ -1,29 +1,42 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
-	"github.com/kemal576/go-pw-manager/repository"
-	"github.com/kemal576/go-pw-manager/service"
-	"github.com/kemal576/go-pw-manager/utils"
+	"github.com/kemal576/go-pw-manager/internal/app"
+	"github.com/kemal576/go-pw-manager/internal/secret"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	db, err := repository.Conn()
+	/*dbconn, err := repository.Conn()
 	if err != nil {
 		log.Panic(err)
 	}
-	defer db.Close()
+	defer dbconn.Close()
 
-	userRepository, err := repository.NewUserRepository(db)
-	utils.ErrorCheck(err)
-	userService := service.NewUserService(userRepository)
-	user := userService.GetById(1)
-	fmt.Printf("Adı: %s\nSoyadı: %s", user.FirstName, user.LastName)
+	db := repository.New(dbconn)
+	router := router.New(*db)
 
-	/*userService.Create(&models.User{Id: 1, FirstName: "Test", LastName: "Testtt",
-	Email: "deneme@gmail.com", Password: "şifre123"})*/
+	println("Listening from http://localhost:5764")
+	log.Fatal(http.ListenAndServe(":5764", router.Router))*/
 
+	keyByte, err := secret.ReadSecret("aes", "enc_key")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	secretText := "ÇOK GİZLİ BİLGİ"
+	println("ŞİFRELENECEK METİN:", secretText)
+	encText, err := app.Encrypt(secretText, string(keyByte))
+	if err != nil {
+		log.Fatal(err)
+	}
+	println("ŞİFRELENMİŞ METİN:", encText)
+	decText, err := app.Decrypt(encText, string(keyByte))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	println("ŞİFRESİ ÇÖZÜLMÜŞ METİN:", decText)
 }
