@@ -2,6 +2,7 @@ package login
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/kemal576/go-pw-manager/models"
 )
@@ -49,7 +50,7 @@ func (u *Repository) GetById(id int) (models.Login, error) {
 
 func (u *Repository) GetLoginsByUserId(userId int) ([]models.Login, error) {
 	var logins []models.Login
-	response, err := u.db.Query("SELECT * FROM logins WHERE userId=$1", userId)
+	response, err := u.db.Query("SELECT * FROM logins WHERE user_id=$1", userId)
 	if err != nil {
 		return logins, err
 	}
@@ -67,7 +68,7 @@ func (u *Repository) GetLoginsByUserId(userId int) ([]models.Login, error) {
 
 func (u *Repository) Create(login *models.Login) (int, error) {
 	var lastInsertId int
-	stmt, err := u.db.Prepare("INSERT INTO logins(url,identity,password,userId) VALUES($1,$2,$3,$4) returning id;")
+	stmt, err := u.db.Prepare("INSERT INTO logins(url,identity,password,user_id) VALUES($1,$2,$3,$4) returning id;")
 	if err != nil {
 		return 0, err
 	}
@@ -77,12 +78,13 @@ func (u *Repository) Create(login *models.Login) (int, error) {
 }
 
 func (u *Repository) Update(login *models.Login) error {
-	stmt, err := u.db.Prepare("UPDATE logins SET url=$1, identity=$2, password=$3 WHERE id=$4")
+	stmt, err := u.db.Prepare("UPDATE logins SET url=$1, identity=$2, password=$3, updated_at=$4 WHERE id=$5")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	stmt.Exec(login.URL, login.Identity, login.Password, login.Id)
+	stmt.Exec(login.URL, login.Identity, login.Password, time.Now(), login.Id)
+
 	return nil
 }
 

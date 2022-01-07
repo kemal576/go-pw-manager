@@ -2,14 +2,16 @@ package main
 
 import (
 	"log"
+	"net/http"
 
-	"github.com/kemal576/go-pw-manager/internal/app"
-	"github.com/kemal576/go-pw-manager/internal/secret"
+	"github.com/kemal576/go-pw-manager/internal/router"
+	"github.com/kemal576/go-pw-manager/repository"
 	_ "github.com/lib/pq"
+	"github.com/rs/cors"
 )
 
 func main() {
-	/*dbconn, err := repository.Conn()
+	dbconn, err := repository.Conn()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -17,26 +19,8 @@ func main() {
 
 	db := repository.New(dbconn)
 	router := router.New(*db)
+	handler := cors.AllowAll().Handler(router.Router)
 
-	println("Listening from http://localhost:5764")
-	log.Fatal(http.ListenAndServe(":5764", router.Router))*/
-
-	keyByte, err := secret.ReadSecret("aes", "enc_key")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	secretText := "ÇOK GİZLİ BİLGİ"
-	println("ŞİFRELENECEK METİN:", secretText)
-	encText, err := app.Encrypt(secretText, string(keyByte))
-	if err != nil {
-		log.Fatal(err)
-	}
-	println("ŞİFRELENMİŞ METİN:", encText)
-	decText, err := app.Decrypt(encText, string(keyByte))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	println("ŞİFRESİ ÇÖZÜLMÜŞ METİN:", decText)
+	println("Server started: http://localhost:5764")
+	log.Fatal(http.ListenAndServe(":5764", handler))
 }

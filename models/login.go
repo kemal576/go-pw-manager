@@ -18,3 +18,12 @@ type LoginDTO struct {
 	Password string `json:"password"`
 	UserId   int    `json:"userId"`
 }
+
+func ToLogin(loginDto LoginDTO) *Login {
+	return &Login{
+		URL:      loginDto.URL,
+		Identity: loginDto.Identity,
+		Password: loginDto.Password,
+		UserId:   loginDto.UserId,
+	}
+}

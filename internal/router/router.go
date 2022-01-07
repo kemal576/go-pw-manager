@@ -24,9 +24,16 @@ func New(rp repository.Database) *Router {
 func (r *Router) initRoutes() {
 	// User endpoints
 	r.Router.HandlerFunc("GET", "/users", api.IsAuthorized(api.AllUsers(r.repos.Users())))
-	r.Router.HandlerFunc("POST", "/users", api.Create(r.repos.Users()))
+	r.Router.HandlerFunc("POST", "/users", api.CreateUser(r.repos.Users()))
+
+	//Login endpoints
+	r.Router.HandlerFunc("GET", "/logins", api.IsAuthorized(api.GetLogins(r.repos.Logins())))
+	r.Router.HandlerFunc("GET", "/user/:id/logins", api.IsAuthorized(api.GetLoginsByUserId(r.repos.Logins())))
+	r.Router.HandlerFunc("GET", "/logins/:id", api.IsAuthorized(api.GetLoginById(r.repos.Logins())))
+	r.Router.HandlerFunc("POST", "/logins", api.IsAuthorized(api.CreateLogin(r.repos.Logins())))
 
 	// Auth endpoints
 	r.Router.HandlerFunc("POST", "/signin", api.SignIn(r.repos.Users()))
 	r.Router.HandlerFunc("GET", "/signout", api.Signout())
+
 }

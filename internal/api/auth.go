@@ -13,13 +13,12 @@ import (
 
 func IsAuthorized(endpoint func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("token")
-		if err != nil {
+		if r.Header["Authorization"] == nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-
-		token, err := jwt.Parse(cookie.Value, func(t *jwt.Token) (interface{}, error) {
+		cookieToken := r.Header["Authorization"]
+		token, err := jwt.Parse(cookieToken[0], func(t *jwt.Token) (interface{}, error) {
 			key, _ := app.GetJWTSecret()
 			return key, nil
 		})
@@ -37,7 +36,6 @@ func IsAuthorized(endpoint func(w http.ResponseWriter, r *http.Request)) http.Ha
 func SignIn(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var signinModel models.SignIn
-
 		decoder := json.NewDecoder(r.Body)
 		if err := decoder.Decode(&signinModel); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -57,10 +55,8 @@ func SignIn(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
-		userDto := models.ToUserDTO(&user)
-		cookie := &http.Cookie{Name: "token", Value: token, Expires: time.Now().Add(time.Hour * 24), HttpOnly: true, Path: "/"}
-		http.SetCookie(w, cookie)
-		RespondWithJSON(w, http.StatusOK, userDto)
+		tokenRes := &models.TokenResponse{UserId: user.Id, Email: user.Email, TokenString: token}
+		RespondWithJSON(w, http.StatusOK, tokenRes)
 	}
 }
 

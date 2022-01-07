@@ -1,6 +1,7 @@
 package app
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -30,6 +31,32 @@ func GenerateJWT(userId int) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func CheckUser(userId int, r *http.Request) error {
+	cookieToken := r.Header["Authorization"]
+
+	tokenStr := cookieToken[0]
+	claims := &models.Claims{}
+	jwtKey, err := GetJWTSecret()
+	if err != nil {
+		return err
+	}
+	tkn, err := jwt.ParseWithClaims(tokenStr, claims,
+		func(t *jwt.Token) (interface{}, error) { return jwtKey, nil })
+
+	if err != nil {
+		return err
+	}
+
+	if !tkn.Valid {
+		return err
+	}
+
+	if claims.UserId == userId {
+		return nil
+	}
+	return err
 }
 
 func GetJWTSecret() ([]byte, error) {

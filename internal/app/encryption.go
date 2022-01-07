@@ -7,12 +7,18 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+
+	"github.com/kemal576/go-pw-manager/internal/secret"
 )
 
-func Encrypt(stringToEncrypt string, keyString string) (string, error) {
+func Encrypt(stringToEncrypt string) (string, error) {
 	var ciphertext []byte
+	key, err := secret.ReadSecret("aes", "enc_key")
+	if err != nil {
+		return "", err
+	}
 	//Since the key is in string, we need to convert decode it to bytes
-	key, _ := hex.DecodeString(keyString)
+	key, _ = hex.DecodeString(string(key))
 	plaintext := []byte(stringToEncrypt)
 
 	//Create a new Cipher Block from the key
@@ -39,9 +45,12 @@ func Encrypt(stringToEncrypt string, keyString string) (string, error) {
 	return fmt.Sprintf("%x", ciphertext), nil
 }
 
-func Decrypt(encryptedString string, keyString string) (string, error) {
-
-	key, _ := hex.DecodeString(keyString)
+func Decrypt(encryptedString string) (string, error) {
+	key, err := secret.ReadSecret("aes", "enc_key")
+	if err != nil {
+		return "", err
+	}
+	key, _ = hex.DecodeString(string(key))
 	enc, _ := hex.DecodeString(encryptedString)
 
 	//Create a new Cipher Block from the key

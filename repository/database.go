@@ -4,12 +4,14 @@ import (
 	"database/sql"
 
 	"github.com/kemal576/go-pw-manager/internal/secret"
+	"github.com/kemal576/go-pw-manager/repository/login"
 	"github.com/kemal576/go-pw-manager/repository/user"
 )
 
 type Database struct {
-	db    *sql.DB
-	users UserRepository
+	db     *sql.DB
+	users  UserRepository
+	logins LoginRepository
 }
 
 func Conn() (*sql.DB, error) {
@@ -29,12 +31,17 @@ func Conn() (*sql.DB, error) {
 
 func New(db *sql.DB) *Database {
 	return &Database{
-		db:    db,
-		users: user.NewRepository(db),
+		db:     db,
+		users:  user.NewRepository(db),
+		logins: login.NewRepository(db),
 	}
 }
 
 // Users returns the UserRepository.
 func (db *Database) Users() UserRepository {
 	return db.users
+}
+
+func (db *Database) Logins() LoginRepository {
+	return db.logins
 }

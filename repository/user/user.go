@@ -62,6 +62,7 @@ func (u *Repository) GetByEmail(email string) (models.User, error) {
 	}
 	return user, nil
 }
+
 func (u *Repository) CheckCredentials(email, password string) (models.User, error) {
 	user, err := u.GetByEmail(email)
 	if err != nil {
