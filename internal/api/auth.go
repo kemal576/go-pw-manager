@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/kemal576/go-pw-manager/internal/app"
@@ -60,6 +59,7 @@ func SignIn(u repository.UserRepository) http.HandlerFunc {
 	}
 }
 
+/*
 func Signout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie := &http.Cookie{
@@ -72,8 +72,9 @@ func Signout() http.HandlerFunc {
 		http.SetCookie(w, cookie)
 		w.WriteHeader(http.StatusOK)
 	}
-}
+}*/
 
+/*
 func RefreshToken() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("token")
@@ -128,4 +129,4 @@ func RefreshToken() http.HandlerFunc {
 				Expires: expirationTime,
 			})
 	}
-}
+}*/

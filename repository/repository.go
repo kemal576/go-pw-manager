@@ -16,6 +16,7 @@ type LoginRepository interface {
 	GetAll() ([]models.Login, error)
 	GetById(id int) (models.Login, error)
 	GetLoginsByUserId(userId int) ([]models.Login, error)
+	GetLoginByUrl(userId int, url string) (models.Login, error)
 	Create(login *models.Login) (int, error)
 	Update(login *models.Login) error
 	Delete(id int) error

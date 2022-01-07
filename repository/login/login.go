@@ -66,6 +66,20 @@ func (u *Repository) GetLoginsByUserId(userId int) ([]models.Login, error) {
 	return logins, nil
 }
 
+func (u *Repository) GetLoginByUrl(userId int, url string) (models.Login, error) {
+	var login models.Login
+	response, err := u.db.Query("SELECT * FROM logins WHERE user_id=$1 AND url=$2", userId, url)
+	if err != nil {
+		return login, err
+	}
+
+	err = response.Scan(&login.Id, &login.URL, &login.Identity, &login.Password, &login.CreatedAt, &login.UpdatedAt, &login.UserId)
+	if err != nil {
+		return login, err
+	}
+	return login, nil
+}
+
 func (u *Repository) Create(login *models.Login) (int, error) {
 	var lastInsertId int
 	stmt, err := u.db.Prepare("INSERT INTO logins(url,identity,password,user_id) VALUES($1,$2,$3,$4) returning id;")

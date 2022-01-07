@@ -33,6 +33,22 @@ func GetLoginsByUserId(id int, repo repository.LoginRepository) ([]models.Login,
 	return logins, nil
 }
 
+func GetLoginByUrl(id int, url string, repo repository.LoginRepository) (models.Login, error) {
+	login, err := repo.GetLoginByUrl(id, url)
+	if err != nil {
+		return login, err
+	}
+
+	login.Identity, err = Decrypt(login.Identity)
+	login.Password, err = Decrypt(login.Password)
+
+	if err != nil {
+		return login, err
+	}
+
+	return login, nil
+}
+
 func CreateLogin(loginDto models.LoginDTO, repo repository.LoginRepository) (int, error) {
 	login := models.ToLogin(loginDto)
 	var err error
