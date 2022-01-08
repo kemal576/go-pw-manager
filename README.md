@@ -1,5 +1,5 @@
 
-# Go Password Manager 
+# Go Password Manager API
 
 This project is the API part of the password management software I developed for Yemeksepeti Go Bootcamp.
 ## Technologies
