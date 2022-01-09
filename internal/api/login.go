@@ -7,6 +7,7 @@ import (
 	"github.com/kemal576/go-pw-manager/internal/app"
 	"github.com/kemal576/go-pw-manager/models"
 	"github.com/kemal576/go-pw-manager/repository"
+	"github.com/kemal576/go-pw-manager/utils"
 )
 
 func GetLogins(repo repository.LoginRepository) http.HandlerFunc {
@@ -27,26 +28,14 @@ func GetLogins(repo repository.LoginRepository) http.HandlerFunc {
 
 func GetLoginsByUserId(repo repository.LoginRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		/*params := httprouter.ParamsFromContext(r.Context())
-		idStr := params.ByName("id")
-		if idStr == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}*/
-
-		id, err := app.GetIntParam("id", r)
+		id, err := utils.GetIntParam("id", r)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "There is no UserID!")
+			return
 		}
 
-		err = app.CheckUser(id, r)
-		if err != nil {
+		check := app.CheckUser(id, r)
+		if check != true {
 			RespondWithError(w, http.StatusUnauthorized, "You are not authorized to perform this operation!")
 			return
 		}
@@ -67,19 +56,7 @@ func GetLoginsByUserId(repo repository.LoginRepository) http.HandlerFunc {
 
 func GetLoginById(repo repository.LoginRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		/*params := httprouter.ParamsFromContext(r.Context())
-		idStr := params.ByName("id")
-		if idStr == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}*/
-		id, err := app.GetIntParam("id", r)
+		id, err := utils.GetIntParam("id", r)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "There is no LoginID!")
 		}
@@ -126,18 +103,18 @@ func UpdateLogin(repo repository.LoginRepository) http.HandlerFunc {
 
 		decoder := json.NewDecoder(r.Body)
 		if err := decoder.Decode(&login); err != nil {
-			RespondWithError(w, http.StatusBadRequest, "Payload could not be parsed!")
+			RespondWithError(w, http.StatusUnprocessableEntity, "Payload could not be parsed!")
 			return
 		}
 		defer r.Body.Close()
 
-		err := app.CheckUser(login.UserId, r)
-		if err != nil {
+		check := app.CheckUser(login.UserId, r)
+		if check != true {
 			RespondWithError(w, http.StatusUnauthorized, "You are not authorized to perform this operation!")
 			return
 		}
 
-		_, err = app.UpdateLogin(login, repo)
+		_, err := app.UpdateLogin(login, repo)
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, "Login could not updated!")
 			return
@@ -148,19 +125,7 @@ func UpdateLogin(repo repository.LoginRepository) http.HandlerFunc {
 
 func DeleteLogin(repo repository.LoginRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		/*params := httprouter.ParamsFromContext(r.Context())
-		idStr := params.ByName("id")
-		if idStr == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}*/
-		id, err := app.GetIntParam("id", r)
+		id, err := utils.GetIntParam("id", r)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "There is no LoginID!")
 		}
@@ -170,8 +135,8 @@ func DeleteLogin(repo repository.LoginRepository) http.HandlerFunc {
 			RespondWithError(w, http.StatusInternalServerError, "Login not found!")
 		}
 
-		err = app.CheckUser(login.UserId, r)
-		if err != nil {
+		check := app.CheckUser(login.UserId, r)
+		if check != true {
 			RespondWithError(w, http.StatusUnauthorized, "You are not authorized to perform this operation!")
 			return
 		}

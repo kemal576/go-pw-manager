@@ -13,7 +13,7 @@ import (
 func IsAuthorized(endpoint func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header["Authorization"] == nil {
-			w.WriteHeader(http.StatusUnauthorized)
+			RespondWithError(w, http.StatusUnauthorized, "Authorization header is empty!")
 			return
 		}
 		cookieToken := r.Header["Authorization"]
@@ -23,7 +23,7 @@ func IsAuthorized(endpoint func(w http.ResponseWriter, r *http.Request)) http.Ha
 		})
 
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
+			RespondWithError(w, http.StatusInternalServerError, "Jwt could not be parsed!")
 		}
 
 		if token.Valid {
@@ -37,20 +37,20 @@ func SignIn(u repository.UserRepository) http.HandlerFunc {
 		var signinModel models.SignIn
 		decoder := json.NewDecoder(r.Body)
 		if err := decoder.Decode(&signinModel); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			RespondWithError(w, http.StatusUnprocessableEntity, "Payload could not be parsed!")
 			return
 		}
 		defer r.Body.Close()
 
 		user, err := u.CheckCredentials(signinModel.Email, signinModel.Password)
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
+			RespondWithError(w, http.StatusUnauthorized, "Email and password does not match!")
 			return
 		}
 
 		token, err := app.GenerateJWT(user.Id)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			RespondWithError(w, http.StatusInternalServerError, "Error occurred while generating jwt.!")
 			return
 		}
 

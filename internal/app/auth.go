@@ -33,39 +33,36 @@ func GenerateJWT(userId int) (string, error) {
 	return tokenString, nil
 }
 
-func CheckUser(userId int, r *http.Request) error {
+func CheckUser(userId int, r *http.Request) bool {
 	cookieToken := r.Header["Authorization"]
 
 	tokenStr := cookieToken[0]
 	claims := &models.Claims{}
 	jwtKey, err := GetJWTSecret()
 	if err != nil {
-		return err
+		return false
 	}
 	tkn, err := jwt.ParseWithClaims(tokenStr, claims,
 		func(t *jwt.Token) (interface{}, error) { return jwtKey, nil })
 
 	if err != nil {
-		return err
+		return false
 	}
 
 	if !tkn.Valid {
-		return err
+		return false
 	}
 
-	if claims.UserId == userId {
-		return nil
-	}
-	return err
+	return claims.UserId == userId
 }
 
 func GetJWTSecret() ([]byte, error) {
 	var key []byte
-	secret, err := secret.ReadSecrets("jwt")
+	secret, err := secret.ReadSecrets("JWT")
 	if err != nil {
 		return key, err
 	}
 
-	key = []byte(secret["jwt_key"])
+	key = []byte(secret["JWT_KEY"])
 	return key, nil
 }

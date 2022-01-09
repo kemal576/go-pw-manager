@@ -15,13 +15,13 @@ type Database struct {
 }
 
 func Conn() (*sql.DB, error) {
-	creds, err := secret.ReadSecrets("dbsecrets")
+	creds, err := secret.ReadSecrets("DB_SECRETS")
 	if err != nil {
 		return nil, err
 	}
 	//println("postgres", "user="+creds["user"]+" password="+creds["password"]+" dbname="+creds["dbname"]+"sslmode=disable")
-	db, err2 := sql.Open("postgres", " user="+creds["user"]+" password="+
-		creds["password"]+" dbname="+creds["dbname"]+" sslmode=disable")
+	db, err2 := sql.Open("postgres", " user="+creds["USERNAME"]+" password="+
+		creds["PASSWORD"]+" dbname="+creds["DB_NAME"]+" sslmode=disable")
 	if err2 != nil {
 		return nil, err2
 	}

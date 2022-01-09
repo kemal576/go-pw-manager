@@ -7,6 +7,7 @@ import (
 	"github.com/kemal576/go-pw-manager/internal/app"
 	"github.com/kemal576/go-pw-manager/models"
 	"github.com/kemal576/go-pw-manager/repository"
+	"github.com/kemal576/go-pw-manager/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,19 +28,8 @@ func AllUsers(u repository.UserRepository) http.HandlerFunc {
 
 func GetUser(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		/*params := httprouter.ParamsFromContext(r.Context())
-		idStr := params.ByName("id")
-		if idStr == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
 
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}*/
-		id, err := app.GetIntParam("id", r)
+		id, err := utils.GetIntParam("id", r)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "There is no UserID!")
 		}
@@ -64,6 +54,12 @@ func CreateUser(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 		defer r.Body.Close()
+
+		_, err := u.GetByEmail(user.Email)
+		if err == nil {
+			RespondWithError(w, http.StatusInternalServerError, "This email is being used by someone else!")
+			return
+		}
 
 		pw_hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 		if err != nil {
@@ -99,9 +95,15 @@ func UpdateUser(u repository.UserRepository) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		err := app.CheckUser(user.Id, r)
-		if err != nil {
+		check := app.CheckUser(user.Id, r)
+		if check != true {
 			RespondWithError(w, http.StatusBadRequest, "You are not authorized to perform this operation!")
+			return
+		}
+
+		_, err := u.GetByEmail(user.Email)
+		if err == nil {
+			RespondWithError(w, http.StatusInternalServerError, "This email is being used by someone else!")
 			return
 		}
 
@@ -136,13 +138,13 @@ func DeleteUser(repo repository.UserRepository) http.HandlerFunc {
 			RespondWithError(w, http.StatusBadRequest, "An error occured while parsing UserID!")
 			return
 		}*/
-		id, err := app.GetIntParam("id", r)
+		id, err := utils.GetIntParam("id", r)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "An error occured while getting UserID!")
 		}
 
-		err = app.CheckUser(id, r)
-		if err != nil {
+		check := app.CheckUser(id, r)
+		if check != true {
 			RespondWithError(w, http.StatusUnauthorized, "You are not authorized to perform this operation!")
 			return
 		}

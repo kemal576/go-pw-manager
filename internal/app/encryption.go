@@ -13,7 +13,7 @@ import (
 
 func Encrypt(stringToEncrypt string) (string, error) {
 	var ciphertext []byte
-	key, err := secret.ReadSecret("aes", "enc_key")
+	key, err := secret.ReadSecret("AES", "ENC_KEY")
 	if err != nil {
 		return "", err
 	}
@@ -46,7 +46,7 @@ func Encrypt(stringToEncrypt string) (string, error) {
 }
 
 func Decrypt(encryptedString string) (string, error) {
-	key, err := secret.ReadSecret("aes", "enc_key")
+	key, err := secret.ReadSecret("AES", "ENC_KEY")
 	if err != nil {
 		return "", err
 	}
