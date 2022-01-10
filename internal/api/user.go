@@ -55,8 +55,9 @@ func CreateUser(u repository.UserRepository) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		_, err := u.GetByEmail(user.Email)
-		if err == nil {
+		usertemp, err := u.GetByEmail(user.Email)
+		if err == nil && usertemp.Id > 0 {
+			println("USER_ID:", usertemp.Id)
 			RespondWithError(w, http.StatusInternalServerError, "This email is being used by someone else!")
 			return
 		}
@@ -80,7 +81,7 @@ func CreateUser(u repository.UserRepository) http.HandlerFunc {
 			return
 		}
 
-		RespondWithJSON(w, http.StatusCreated, userNew)
+		RespondWithJSON(w, http.StatusCreated, models.ToUserReturnDTO(&userNew))
 	}
 }
 
@@ -126,18 +127,6 @@ func UpdateUser(u repository.UserRepository) http.HandlerFunc {
 
 func DeleteUser(repo repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		/*params := httprouter.ParamsFromContext(r.Context())
-		idStr := params.ByName("id")
-		if idStr == "" {
-			RespondWithError(w, http.StatusBadRequest, "There is no UserID in parameters!")
-			return
-		}
-
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			RespondWithError(w, http.StatusBadRequest, "An error occured while parsing UserID!")
-			return
-		}*/
 		id, err := utils.GetIntParam("id", r)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "An error occured while getting UserID!")
@@ -152,7 +141,6 @@ func DeleteUser(repo repository.UserRepository) http.HandlerFunc {
 		err = repo.Delete(id)
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "User could not be deleted!")
-
 			return
 		}
 		w.WriteHeader(http.StatusOK)

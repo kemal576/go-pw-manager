@@ -81,6 +81,12 @@ func CreateLogin(repo repository.LoginRepository) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
+		check := app.CheckUser(login.UserId, r)
+		if !check {
+			RespondWithError(w, http.StatusUnauthorized, "You are not authorized to perform this operation!")
+			return
+		}
+
 		id, err := app.CreateLogin(login, repo)
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, "Login could not create!")
