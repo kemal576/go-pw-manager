@@ -10,6 +10,9 @@ import (
 	"github.com/kemal576/go-pw-manager/repository"
 )
 
+//This method checks the request header of the sent endpoint method and if there is a jwt token,
+//it returns results by checking the validity of the token.
+//If the token is valid, the current endpoint is executed. If not valid, the specified response is returned.
 func IsAuthorized(endpoint func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header["Authorization"] == nil {
@@ -23,7 +26,7 @@ func IsAuthorized(endpoint func(w http.ResponseWriter, r *http.Request)) http.Ha
 		})
 
 		if err != nil {
-			RespondWithError(w, http.StatusInternalServerError, "Jwt could not be parsed!")
+			RespondWithError(w, http.StatusUnauthorized, "JWT is not valid!")
 		}
 
 		if token.Valid {
@@ -32,6 +35,9 @@ func IsAuthorized(endpoint func(w http.ResponseWriter, r *http.Request)) http.Ha
 	})
 }
 
+//This method compares the submitted credentials with those in the database.
+//Returns the JWT token if the information is valid.
+//If the information is not valid, it returns the specified response.
 func SignIn(u repository.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var signinModel models.SignIn
@@ -72,7 +78,8 @@ func Signout() http.HandlerFunc {
 		http.SetCookie(w, cookie)
 		w.WriteHeader(http.StatusOK)
 	}
-}*/
+}
+*/
 
 /*
 func RefreshToken() http.HandlerFunc {

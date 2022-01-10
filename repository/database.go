@@ -14,21 +14,22 @@ type Database struct {
 	logins LoginRepository
 }
 
+//This method reads database connection information from Vault and returns the newly opened connection.
 func Conn() (*sql.DB, error) {
 	creds, err := secret.ReadSecrets("DB_SECRETS")
 	if err != nil {
 		return nil, err
 	}
-	//println("postgres", "user="+creds["user"]+" password="+creds["password"]+" dbname="+creds["dbname"]+"sslmode=disable")
-	db, err2 := sql.Open("postgres", " user="+creds["USERNAME"]+" password="+
+	db, err := sql.Open("postgres", " user="+creds["USERNAME"]+" password="+
 		creds["PASSWORD"]+" dbname="+creds["DB_NAME"]+" sslmode=disable")
-	if err2 != nil {
-		return nil, err2
+	if err != nil {
+		return nil, err
 	}
 
 	return db, nil
 }
 
+//This constructor returns the current database connection and any repositories enabled with it.
 func New(db *sql.DB) *Database {
 	return &Database{
 		db:     db,
@@ -42,6 +43,7 @@ func (db *Database) Users() UserRepository {
 	return db.users
 }
 
+// Logins returns the LoginRepository.
 func (db *Database) Logins() LoginRepository {
 	return db.logins
 }

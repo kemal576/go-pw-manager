@@ -5,6 +5,7 @@ import (
 	"github.com/kemal576/go-pw-manager/repository"
 )
 
+//This method returns all registered logins by reaching the repository.
 func GetAllLogins(repo repository.LoginRepository) ([]models.Login, error) {
 	logins, err := repo.GetAll()
 	if err != nil {
@@ -14,6 +15,7 @@ func GetAllLogins(repo repository.LoginRepository) ([]models.Login, error) {
 	return logins, nil
 }
 
+//This method returns all logins registered to the database with the userId sent by reaching the repository.
 func GetLoginsByUserId(id int, repo repository.LoginRepository) ([]models.Login, error) {
 	logins, err := repo.GetLoginsByUserId(id)
 	if err != nil {

@@ -11,6 +11,7 @@ import (
 	"github.com/kemal576/go-pw-manager/internal/secret"
 )
 
+//This method encrypts the given text with the key stored in the Vault and returns the ciphertext.
 func Encrypt(stringToEncrypt string) (string, error) {
 	var ciphertext []byte
 	key, err := secret.ReadSecret("AES", "ENC_KEY")
@@ -45,6 +46,7 @@ func Encrypt(stringToEncrypt string) (string, error) {
 	return fmt.Sprintf("%x", ciphertext), nil
 }
 
+//This method decrypts the given text with the key stored in the Vault and returns the plain text.
 func Decrypt(encryptedString string) (string, error) {
 	key, err := secret.ReadSecret("AES", "ENC_KEY")
 	if err != nil {

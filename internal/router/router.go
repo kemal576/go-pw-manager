@@ -11,7 +11,6 @@ type Router struct {
 	repos  repository.Database
 }
 
-// New ...
 func New(rp repository.Database) *Router {
 	r := &Router{
 		Router: httprouter.New(),

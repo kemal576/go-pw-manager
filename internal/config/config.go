@@ -8,6 +8,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+//This method reads the requested config file and returns a config model.
 func ReadConfiguration(configName string) models.Config {
 	var config models.Config
 

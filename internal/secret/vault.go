@@ -7,6 +7,7 @@ import (
 	"github.com/kemal576/go-pw-manager/internal/config"
 )
 
+//This method reads all secret information from the Vault using the sent path and returns it as a map.
 func ReadSecrets(vaultPath string) (map[string]string, error) {
 	cfg := config.ReadConfiguration("config.yaml")
 	conf := &api.Config{Address: "http://" + cfg.VaultAddress + ":" + cfg.VaultPort}
@@ -31,6 +32,7 @@ func ReadSecrets(vaultPath string) (map[string]string, error) {
 	return dataStr, nil
 }
 
+//This method reads the data on the Vault using the sent path and name and returns []bytes.
 func ReadSecret(vaultPath, secretName string) ([]byte, error) {
 	var key []byte
 	secret, err := ReadSecrets(vaultPath)

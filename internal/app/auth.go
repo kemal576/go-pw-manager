@@ -9,6 +9,7 @@ import (
 	"github.com/kemal576/go-pw-manager/models"
 )
 
+//This method generates and returns a new JWT by receiving the sent user information.
 func GenerateJWT(userId int) (string, error) {
 	key, err := GetJWTSecret()
 	if err != nil {
@@ -33,6 +34,8 @@ func GenerateJWT(userId int) (string, error) {
 	return tokenString, nil
 }
 
+//This method compares the sent user id with the user registered to the token in the request.
+//In this way, it prevents unauthorized access.
 func CheckUser(userId int, r *http.Request) bool {
 	cookieToken := r.Header["Authorization"]
 
@@ -56,6 +59,7 @@ func CheckUser(userId int, r *http.Request) bool {
 	return claims.UserId == userId
 }
 
+//This method reads and returns the jwt secret key stored in the Vault.
 func GetJWTSecret() ([]byte, error) {
 	var key []byte
 	secret, err := secret.ReadSecrets("JWT")

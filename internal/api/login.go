@@ -35,7 +35,7 @@ func GetLoginsByUserId(repo repository.LoginRepository) http.HandlerFunc {
 		}
 
 		check := app.CheckUser(id, r)
-		if check != true {
+		if !check {
 			RespondWithError(w, http.StatusUnauthorized, "You are not authorized to perform this operation!")
 			return
 		}
