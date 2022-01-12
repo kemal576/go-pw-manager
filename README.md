@@ -56,5 +56,162 @@ To run this project, you will need to create a config.yaml file in the root proj
 `VAULT_TOKEN`
 
 
+## API Usage
+> :warning: A valid JWT is required for all endpoints except adding users and logging in. The JWT should be added to the Authorization header of the request to be sent, without the "Bearer" part.
+
+
+- **User Endpoints:**
+
+#### Get all users:
+
+```http
+  GET /users
+```
+------
+#### Get specified user:
+
+```http
+  GET /users/${id}
+```
+
+| Parameter | Explanation                       |
+| :-------- | :-------------------------------- |
+| `id`      | **Necessary**. Key value of the item to be called. |
+
+------
+#### Create user:
+
+```http
+  POST /users
+```
+Sample request body:
+```json
+{
+ "firstname": "Kemal",
+ "lastname": "Şahin",
+ "password": "test123",
+ "email": "kemalsahin@gmail.com"
+}
+
+```
+---
+#### Update user:
+
+```http
+  PUT /users
+```
+Sample request body:
+```json
+{
+ "id": "1",
+ "firstname": "Kemal",
+ "lastname": "Şahin",
+ "password": "test123",
+ "email": "kemalsahin@gmail.com"
+}
+
+```
+-----
+#### Delete user:
+
+```http
+  DELETE /users/${id}
+```
+
+| Parameter | Explanation                       |
+| :-------- | :-------------------------------- |
+| `id`      | **Necessary**. Key value of the item to be deleted. |
+
+----
+
+- **Login Endpoints:**
   
-## => Folder structure and endpoint documentation will be added.
+#### Get all logins:
+
+```http
+  GET /logins
+```
+------
+#### Get specified login:
+
+```http
+  GET /logins/${id}
+```
+
+| Parameter | Explanation                       |
+| :-------- | :-------------------------------- |
+| `id`      | **Necessary**. Key value of the item to be called. |
+
+------
+
+#### Get logins for specified user
+
+```http
+  GET /user/${id}/logins
+```
+
+| Parameter | Explanation                       |
+| :-------- | :-------------------------------- |
+| `id`      | **Necessary**. Key value of the item to be called. |
+
+------
+#### Create login:
+
+```http
+  POST /logins
+```
+Sample request body:
+```json
+{
+  "url": "kommunity.com",
+  "identity": "kemalsahin",
+  "password": "test123",
+  "userId": 1
+}
+
+```
+---
+#### Update login:
+
+```http
+  PUT /logins
+```
+Sample request body:
+```json
+{
+  "id": "3",
+  "url": "kommunity.com",
+  "identity": "kemalsahin576",
+  "password": "test1234",
+}
+
+```
+-----
+#### Delete user:
+
+```http
+  DELETE /logins/${id}
+```
+
+| Parameter | Explanation                       |
+| :-------- | :-------------------------------- |
+| `id`      | **Necessary**. Key value of the item to be deleted. |
+
+----
+
+- **Auth Endpoints:**
+
+#### Sign-In:
+
+```http
+  POST /signin
+```
+Sample request body:
+```json
+{
+  "email": "kemalsahin@gmail.com",
+  "password": "test123"
+}
+
+```
+---
